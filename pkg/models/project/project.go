@@ -41,7 +41,7 @@ func (g *ProjectRepo) GetProjectByID(id uint) (Project, error) {
 
 func (g *ProjectRepo) GetAllProjects() ([]Project, error) {
 	var projects []Project
-	if err := g.DB.Preload("Issues").Find(&projects).Error; err != nil {
+	if err := g.DB.Preload("Issues.Logs").Find(&projects).Error; err != nil {
 		return projects, fmt.Errorf("No projects found: %v", err)
 	}
 	return projects, nil

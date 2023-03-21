@@ -5,7 +5,7 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/patya3/notime/pkg/models/log"
+	"github.com/patya3/notime/pkg/models/timelog"
 )
 
 type Issue struct {
@@ -14,7 +14,7 @@ type Issue struct {
 	IssueTitle string
 	Desc       string
 	ProjectID  uint
-	Logs       []log.Log
+	Logs       []timelog.Log
 }
 
 func (i Issue) Title() string { return i.IssueKey }
