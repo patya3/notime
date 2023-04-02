@@ -53,3 +53,11 @@ func (g *LogRepo) StopTimer(logID uint) (Log, error) {
 	}
 	return log, nil
 }
+
+func (g *LogRepo) GetAllLogsForAnIssue(issueID uint) ([]Log, error) {
+	var logs []Log
+	if err := g.DB.Where("issue_id = ?", issueID).Find(&logs).Error; err != nil {
+		return logs, fmt.Errorf("No logs found: %v", err)
+	}
+	return logs, nil
+}
