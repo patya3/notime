@@ -22,12 +22,12 @@ var newLogger = logger.New(
 		SlowThreshold:             time.Second,   // Slow SQL threshold
 		LogLevel:                  logger.Silent, // Log level
 		IgnoreRecordNotFoundError: true,          // Ignore ErrRecordNotFound error for logger
-		Colorful:                  false,         // Disable color
+		Colorful:                  true,          // Disable color
 	},
 )
 
 func openSqlite() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("new.db"), &gorm.Config{
+	db, err := gorm.Open(sqlite.Open("logs.db"), &gorm.Config{
 		Logger: newLogger,
 	})
 	if err != nil {
@@ -42,11 +42,12 @@ func openSqlite() *gorm.DB {
 
 func main() {
 	db := openSqlite()
-	// projectRepo := project.ProjectRepo{DB: db}
+	projectRepo := project.ProjectRepo{DB: db}
 	issueRepo := issue.IssueRepo{DB: db}
 	logRepo := timelog.LogRepo{DB: db}
 
 	constants.IssueRepo = &issueRepo
 	constants.LogRepo = &logRepo
+	constants.ProjectRepo = &projectRepo
 	tui.StartTui()
 }

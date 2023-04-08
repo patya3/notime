@@ -12,6 +12,7 @@ type Log struct {
 	gorm.Model
 	StoppedAt sql.NullTime
 	IssueID   uint
+	logged    bool
 }
 
 func (l *Log) Title() string {

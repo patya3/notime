@@ -43,8 +43,7 @@ func (g *IssueRepo) GetAllIssues() ([]Issue, error) {
 	return issues, nil
 }
 
-func (g *IssueRepo) CreateIssue(issueKey string, issueTitle string, desc string, projectID uint) (Issue, error) {
-	issue := Issue{IssueKey: issueKey, IssueTitle: issueTitle, Desc: desc, ProjectID: projectID}
+func (g *IssueRepo) CreateIssue(issue Issue) (Issue, error) {
 	if err := g.DB.Create(&issue).Error; err != nil {
 		return issue, fmt.Errorf("Cannot create project: %v", err)
 	}
