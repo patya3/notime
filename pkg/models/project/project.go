@@ -13,7 +13,7 @@ const (
 
 type Project struct {
 	gorm.Model
-	ProjectKey string
+	ProjectKey string `gorm:"unique"`
 	Name       string
 	Issues     []issue.Issue
 }

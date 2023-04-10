@@ -1,16 +1,17 @@
 package addIssueModal
 
 import (
-	// "github.com/gdamore/tcell/v2"
 	"log"
 
 	"github.com/gdamore/tcell/v2"
 	issueModel "github.com/patya3/notime/pkg/models/issue"
 	"github.com/patya3/notime/pkg/tui/constants"
+	"github.com/patya3/notime/pkg/tui/pages/mainPage"
+	"github.com/patya3/notime/pkg/tui/pages/notification"
 	"github.com/rivo/tview"
 )
 
-var addIssueForm = tview.NewForm()
+var AddIssueForm = tview.NewForm()
 
 func InitAddIssueForm(app *tview.Application, pagePrimitive *tview.Pages) tview.Primitive {
 	modal := func(p tview.Primitive, width, height int) tview.Primitive {
@@ -23,29 +24,20 @@ func InitAddIssueForm(app *tview.Application, pagePrimitive *tview.Pages) tview.
 			AddItem(nil, 0, 1, false)
 	}
 
-	addIssueForm.Box.
+	AddIssueForm.Box.
 		SetTitle("Add new issue").
 		SetBorder(true).
 		SetBackgroundColor(tcell.ColorDefault).
 		SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-			switch event.Key() {
-			case tcell.KeyEscape:
+			if event.Rune() == 'q' || event.Key() == tcell.KeyEscape {
 				pagePrimitive.HidePage("AddIssue")
 			}
 			return event
 		})
 
-		// type Issue struct {
-		// 	gorm.Model
-		// 	IssueKey   string
-		// 	IssueTitle string
-		// 	Desc       string
-		// 	ProjectID  uint
-		// 	Logs       []timelog.Log
-		// }
-	initFormElements(addIssueForm, app, pagePrimitive)
+	initFormElements(AddIssueForm, app, pagePrimitive)
 
-	return modal(addIssueForm, 50, 30)
+	return modal(AddIssueForm, 50, 30)
 }
 
 func initFormElements(issueForm *tview.Form, app *tview.Application, pagePrimitive *tview.Pages) {
@@ -61,7 +53,12 @@ func initFormElements(issueForm *tview.Form, app *tview.Application, pagePrimiti
 	}
 	issue := issueModel.Issue{}
 
-	addIssueForm.
+	AddIssueForm.
+		AddDropDown("Project", projectKeys, 0, func(option string, optionIndex int) {
+			if len(projects) > 0 {
+				issue.ProjectID = projects[optionIndex].ID
+			}
+		}).
 		AddInputField("Issue Key", "", 0, nil, func(text string) {
 			issue.IssueKey = text
 		}).
@@ -71,14 +68,14 @@ func initFormElements(issueForm *tview.Form, app *tview.Application, pagePrimiti
 		AddTextArea("Description", "", 0, 0, 0, func(text string) {
 			issue.Desc = text
 		}).
-		AddDropDown("Project", projectKeys, 0, func(option string, optionIndex int) {
-			issue.ProjectID = projects[optionIndex].ID
-		}).
 		AddButton("Save", func() {
 			_, err := constants.IssueRepo.CreateIssue(issue)
 			if err != nil {
-				log.Fatal(err)
+				notification.SetNotification(err.Error())
+				pagePrimitive.ShowPage("Notification")
 			}
+			mainPage.InitIssueListElements()
+			pagePrimitive.HidePage("AddIssue")
 		}).
 		AddButton("Quit", func() {
 			pagePrimitive.HidePage("AddIssue")

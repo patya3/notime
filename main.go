@@ -49,5 +49,7 @@ func main() {
 	constants.IssueRepo = &issueRepo
 	constants.LogRepo = &logRepo
 	constants.ProjectRepo = &projectRepo
+	projectRepo.CreateProject("VM", "Virtual Microscope")
+	projectRepo.CreateProject("IDV", "IDV")
 	tui.StartTui()
 }

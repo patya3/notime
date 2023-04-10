@@ -26,3 +26,7 @@ func RedifineUpAndDown(event *tcell.EventKey) *tcell.EventKey {
 	}
 	return event
 }
+
+// func FilterList(list *tview.List) {
+//     list.FindItems()
+// }

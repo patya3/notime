@@ -5,16 +5,16 @@ import (
 	"github.com/rivo/tview"
 )
 
-var flex = tview.NewFlex()
+var MainPageContainer = tview.NewFlex()
 
 func InitMainPage(app *tview.Application, pagePrimitive *tview.Pages) *tview.Flex {
-	flex.SetBackgroundColor(tcell.ColorDefault)
+	MainPageContainer.SetBackgroundColor(tcell.ColorDefault)
 
 	issueList := InitIssuesList(app, pagePrimitive)
 	notesList := InitNotesList(app)
-	logsList := InitLogsList()
+	logsList := InitLogsList(pagePrimitive)
 
-	flex.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+	MainPageContainer.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Rune() {
 		case 49:
 			app.SetFocus(issueList)
@@ -29,11 +29,11 @@ func InitMainPage(app *tview.Application, pagePrimitive *tview.Pages) *tview.Fle
 		return event
 	})
 
-	flex.
+	MainPageContainer.
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 			AddItem(issueList, 0, 7, true).
 			AddItem(notesList, 0, 5, true), 0, 8, true).
 		AddItem(logsList, 0, 4, false)
 
-	return flex
+	return MainPageContainer
 }

@@ -10,7 +10,7 @@ import (
 
 type Issue struct {
 	gorm.Model
-	IssueKey   string
+	IssueKey   string `gorm:"unique"`
 	IssueTitle string
 	Desc       string
 	ProjectID  uint

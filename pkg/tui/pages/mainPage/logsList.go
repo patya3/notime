@@ -4,14 +4,18 @@ import (
 	"log"
 
 	"github.com/gdamore/tcell/v2"
+	"github.com/patya3/notime/pkg/models/timelog"
 	"github.com/patya3/notime/pkg/tui/constants"
+	"github.com/patya3/notime/pkg/tui/helpers"
+	"github.com/patya3/notime/pkg/tui/pages/logModal"
 	"github.com/rivo/tview"
 )
 
 var logsList = tview.NewList()
+var logs = make([]timelog.Log, 0)
 
-func InitLogsList() *tview.List {
-	logsList.
+func InitLogsList(pagePrimitive *tview.Pages) *tview.List {
+	logsList.Box.
 		SetBorder(true).
 		SetTitle("Logs").
 		SetBackgroundColor(tcell.ColorDefault).
@@ -23,26 +27,26 @@ func InitLogsList() *tview.List {
 		})
 
 	logsList.
-		SetSelectedBackgroundColor(tcell.ColorLightPink.TrueColor()).
-		SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-			switch event.Rune() {
-			case 'j':
-				return tcell.NewEventKey(tcell.KeyDown, rune(tcell.KeyDown), tcell.ModNone)
-			case 'k':
-				return tcell.NewEventKey(tcell.KeyUp, rune(tcell.KeyUp), tcell.ModNone)
-			}
-			return event
-		})
+		SetHighlightFullLine(true).
+		SetSecondaryTextColor(tcell.ColorLightGreen).
+		SetSelectedBackgroundColor(tcell.ColorDarkSlateGray).
+		SetSelectedFunc(func(i int, s1, s2 string, r rune) {
+			pagePrimitive.ShowPage("Log")
+			logModal.SetLogModalText(logs[i].ID)
+		}).
+		SetInputCapture(helpers.RedifineUpAndDown)
 
 	return logsList
 }
 
-func initLogListElements(issueID uint) {
-	logs, err := constants.LogRepo.GetAllLogsForAnIssue(issueID)
+func InitLogListElements(issueID uint) {
+	var err error
+	logsList.Clear()
+	logs, err = constants.LogRepo.GetAllLogsForAnIssue(issueID)
 	if err != nil {
 		log.Fatal(err)
 	}
 	for _, log := range logs {
-		logsList.AddItem(log.Title(), log.Description(), 0, nil)
+		logsList.AddItem(log.Title(true), log.Comment, 0, nil)
 	}
 }
