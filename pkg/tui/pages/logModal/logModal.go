@@ -42,9 +42,9 @@ func InitLogModal(pagePrimitive *tview.Pages) *tview.Grid {
 }
 
 func SetLogModalText(logID uint) {
-	timelog, err := constants.LogRepo.GetLogByID(logID)
+	extendedTimelog, err := constants.LogRepo.GetLogByID(logID)
 	if err != nil {
 		log.Fatal(err)
 	}
-	logModal.SetText(fmt.Sprintf("%s\n[lightgreen]%s\n\n%s%s", timelog.Title(true), timelog.Description(), c.Colors["white"], timelog.Comment))
+	logModal.SetText(fmt.Sprintf("Issue: %s%s\n\n%s\n[lightgreen]%s\n\n%s%s", extendedTimelog.IssueKey, extendedTimelog.IssueTitle, extendedTimelog.Title(), extendedTimelog.Description(), c.Colors["white"], extendedTimelog.Comment))
 }

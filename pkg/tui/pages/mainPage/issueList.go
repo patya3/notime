@@ -1,6 +1,7 @@
 package mainPage
 
 import (
+	"database/sql"
 	"log"
 
 	"github.com/gdamore/tcell/v2"
@@ -11,12 +12,10 @@ import (
 	"github.com/rivo/tview"
 )
 
-var IssueList = tview.NewList()
 var issues = make([]issue.Issue, 0)
-var SelectedIssueId uint
+var SelectedIssueId sql.NullInt32
 
-func InitIssuesList(app *tview.Application, pagePrimitive *tview.Pages) *tview.List {
-
+func InitIssueList(app *tview.Application, pagePrimitive *tview.Pages) {
 	IssueList.Box.
 		SetBorder(true).
 		SetBorderColor(tcell.ColorRed).
@@ -24,6 +23,12 @@ func InitIssuesList(app *tview.Application, pagePrimitive *tview.Pages) *tview.L
 		SetBackgroundColor(tcell.ColorDefault).
 		SetFocusFunc(func() {
 			IssueList.SetBorderColor(tcell.ColorRed)
+			for i, issue := range issues {
+				if len(issue.Logs) > 0 && !issue.Logs[0].StoppedAt.Valid {
+					IssueList.SetCurrentItem(i)
+					break
+				}
+			}
 		}).
 		SetBlurFunc(func() {
 			IssueList.SetBorderColor(tcell.ColorDefault)
@@ -34,13 +39,13 @@ func InitIssuesList(app *tview.Application, pagePrimitive *tview.Pages) *tview.L
 		ShowSecondaryText(false).
 		SetSelectedBackgroundColor(tcell.ColorDarkSlateGray).
 		SetSelectedFunc(func(i int, s1, s2 string, r rune) {
-			app.SetFocus(logsList)
+			app.SetFocus(LogList)
 		}).
 		SetChangedFunc(func(i int, mainText, secondaryText string, shortcut rune) {
-			if SelectedIssueId != issues[i].ID {
-				logsList.Clear()
+			if uint(SelectedIssueId.Int32) != issues[i].ID {
+				LogList.Clear()
 				InitLogListElements(issues[i].ID)
-				SelectedIssueId = issues[i].ID
+				SelectedIssueId.Scan(issues[i].ID)
 			}
 		}).
 		SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
@@ -64,14 +69,14 @@ func InitIssuesList(app *tview.Application, pagePrimitive *tview.Pages) *tview.L
 					if err != nil {
 						log.Fatal(err)
 					}
-					logsList.AddItem(timelog.Title(true), timelog.Description(), 0, nil)
+					LogList.InsertItem(0, timelog.Title(), timelog.Comment, 0, nil)
 				}
 			case 's':
 				if len(issues) == 0 {
 					break
 				}
 				currentIssueId := issues[IssueList.GetCurrentItem()].ID
-				hasRunningLog, err := constants.LogRepo.HasRunningLog(currentIssueId)
+				hasRunningLog, err := constants.LogRepo.HasRunningLog(sql.NullInt32{Int32: int32(currentIssueId), Valid: true})
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -86,8 +91,6 @@ func InitIssuesList(app *tview.Application, pagePrimitive *tview.Pages) *tview.L
 		})
 
 	InitIssueListElements()
-
-	return IssueList
 }
 
 func InitIssueListElements() {

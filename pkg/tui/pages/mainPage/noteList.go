@@ -6,22 +6,20 @@ import (
 	"github.com/rivo/tview"
 )
 
-var notesList = tview.NewList()
+func InitNotesList(app *tview.Application) {
 
-func InitNotesList(app *tview.Application) *tview.List {
-
-	notesList.
+	NoteList.
 		SetBorder(true).
 		SetTitle("Notes").
 		SetBackgroundColor(tcell.ColorDefault).
 		SetFocusFunc(func() {
-			notesList.SetBorderColor(tcell.ColorRed)
+			NoteList.SetBorderColor(tcell.ColorRed)
 		}).
 		SetBlurFunc(func() {
-			notesList.SetBorderColor(tcell.ColorDefault)
+			NoteList.SetBorderColor(tcell.ColorDefault)
 		})
 
-	notesList.
+	NoteList.
 		ShowSecondaryText(false).
 		SetSelectedBackgroundColor(tcell.ColorLightPink.TrueColor()).
 		SetSelectedFunc(func(i int, s1, s2 string, r rune) {
@@ -29,8 +27,6 @@ func InitNotesList(app *tview.Application) *tview.List {
 		}).
 		SetInputCapture(helpers.RedifineUpAndDown)
 
-	notesList.AddItem("Szia", "minden rendben", 0, nil)
-	notesList.AddItem("Szia", "minden rendben", 0, nil)
-
-	return notesList
+	NoteList.AddItem("Szia", "minden rendben", 0, nil)
+	NoteList.AddItem("Szia", "minden rendben", 0, nil)
 }

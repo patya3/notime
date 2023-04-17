@@ -33,7 +33,11 @@ func InitCommentModal(pagePrimitive *tview.Pages) *tview.Grid {
 				if err != nil {
 					log.Fatal(err)
 				}
-				mainPage.InitLogListElements(mainPage.SelectedIssueId)
+				if mainPage.SelectedIssueId.Valid {
+					mainPage.InitLogListElements(uint(mainPage.SelectedIssueId.Int32))
+				} else {
+					mainPage.InitQuickLogListElements()
+				}
 				commentModal.SetText("", true)
 				return nil
 			}
