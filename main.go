@@ -26,8 +26,32 @@ var newLogger = logger.New(
 	},
 )
 
+func getDatabaseFilePath() (string, error) {
+
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+
+	if _, err := os.Stat(homeDir + "/notime"); os.IsNotExist(err) {
+		if err := os.MkdirAll(homeDir+"/notime", os.ModePerm); err != nil {
+			return "", err
+		}
+	}
+
+	if _, err := os.Create("logs.db"); err != nil {
+		return "", err
+	}
+
+	return homeDir + "/notime/logs.db", nil
+}
+
 func openSqlite() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("logs.db"), &gorm.Config{
+	dbFilePath, err := getDatabaseFilePath()
+	if err != nil {
+		log.Fatal(err)
+	}
+	db, err := gorm.Open(sqlite.Open(dbFilePath), &gorm.Config{
 		Logger: newLogger,
 	})
 	if err != nil {

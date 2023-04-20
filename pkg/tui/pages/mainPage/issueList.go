@@ -55,6 +55,8 @@ func InitIssueList(app *tview.Application, pagePrimitive *tview.Pages) {
 				pagePrimitive.ShowPage("AddIssue")
 			case 'a':
 				if len(issues) == 0 {
+					notification.SetNotification("Create an issue first with the letter 'c'.")
+					pagePrimitive.ShowPage("Notification")
 					break
 				}
 				hasRunningLog, err := constants.LogRepo.HasRunningLog(SelectedIssueId)
