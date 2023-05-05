@@ -39,11 +39,14 @@ func getDatabaseFilePath() (string, error) {
 		}
 	}
 
-	if _, err := os.Create("logs.db"); err != nil {
-		return "", err
+	file := homeDir + "/notime/logs.db"
+	if _, err := os.Stat(file); os.IsNotExist(err) {
+		if _, err := os.Create(file); err != nil {
+			return "", err
+		}
 	}
 
-	return homeDir + "/notime/logs.db", nil
+	return file, nil
 }
 
 func openSqlite() *gorm.DB {
