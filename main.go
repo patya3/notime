@@ -16,22 +16,28 @@ import (
 	"github.com/patya3/notime/pkg/tui/constants"
 )
 
-var newLogger = logger.New(
-	log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
-	logger.Config{
-		SlowThreshold:             time.Second,   // Slow SQL threshold
-		LogLevel:                  logger.Silent, // Log level
-		IgnoreRecordNotFoundError: true,          // Ignore ErrRecordNotFound error for logger
-		Colorful:                  true,          // Disable color
-	},
-)
+func createFileLogger(homeDir string) (logger.Interface, error) {
 
-func getDatabaseFilePath() (string, error) {
-
-	homeDir, err := os.UserHomeDir()
+	file, err := os.Create(homeDir + "/notime/runtimeLogs.txt")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
+
+	log.SetOutput(file)
+
+	return logger.New(
+		log.New(file, "\r\n", log.LstdFlags), // io writer
+		logger.Config{
+			SlowThreshold:             time.Second,   // Slow SQL threshold
+			LogLevel:                  logger.Silent, // Log level
+			IgnoreRecordNotFoundError: true,          // Ignore ErrRecordNotFound error for logger
+			Colorful:                  true,          // Disable color
+		},
+	), nil
+
+}
+
+func getDatabaseFilePath(homeDir string) (string, error) {
 
 	if _, err := os.Stat(homeDir + "/notime"); os.IsNotExist(err) {
 		if err := os.MkdirAll(homeDir+"/notime", os.ModePerm); err != nil {
@@ -39,20 +45,34 @@ func getDatabaseFilePath() (string, error) {
 		}
 	}
 
-	if _, err := os.Create("logs.db"); err != nil {
-		return "", err
+	file := homeDir + "/notime/logs.db"
+	if _, err := os.Stat(file); os.IsNotExist(err) {
+		if _, err := os.Create(file); err != nil {
+			return "", err
+		}
 	}
 
-	return homeDir + "/notime/logs.db", nil
+	return file, nil
 }
 
 func openSqlite() *gorm.DB {
-	dbFilePath, err := getDatabaseFilePath()
+	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	dbFilePath, err := getDatabaseFilePath(homeDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fileLogger, err := createFileLogger(homeDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	db, err := gorm.Open(sqlite.Open(dbFilePath), &gorm.Config{
-		Logger: newLogger,
+		Logger: fileLogger,
 	})
 	if err != nil {
 		log.Fatalf("unable to open database: %v", err)
