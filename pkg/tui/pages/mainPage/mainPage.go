@@ -58,7 +58,7 @@ func InitMainPage(app *tview.Application, pagePrimitive *tview.Pages) *tview.Fle
 				SelectedIssueId.Scan(nil)
 				pagePrimitive.ShowPage("AddComment")
 			}
-
+			break
 		}
 		return event
 	})
