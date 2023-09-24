@@ -10,7 +10,7 @@ import (
 
 type Issue struct {
 	gorm.Model
-	IssueKey   string
+	IssueKey   string `gorm:"unique"`
 	IssueTitle string
 	Desc       string
 	ProjectID  uint
@@ -37,14 +37,20 @@ func (g *IssueRepo) GetIssueByID(id uint) (Issue, error) {
 
 func (g *IssueRepo) GetAllIssues() ([]Issue, error) {
 	var issues []Issue
-	if err := g.DB.Find(&issues).Error; err != nil {
+	if err := g.DB.
+		Preload("Logs", func(db *gorm.DB) *gorm.DB { return db.Order("logs.stopped_at").Limit(1) }).
+		Order("created_at desc").
+		Find(&issues).Error; err != nil {
+
 		return issues, fmt.Errorf("No issues found: %v", err)
 	}
+	// str, _ := json.MarshalIndent(issues, "", "\t")
+	// fmt.Println(string(str))
+	// os.Exit(0)
 	return issues, nil
 }
 
-func (g *IssueRepo) CreateIssue(issueKey string, issueTitle string, desc string, projectID uint) (Issue, error) {
-	issue := Issue{IssueKey: issueKey, IssueTitle: issueTitle, Desc: desc, ProjectID: projectID}
+func (g *IssueRepo) CreateIssue(issue Issue) (Issue, error) {
 	if err := g.DB.Create(&issue).Error; err != nil {
 		return issue, fmt.Errorf("Cannot create project: %v", err)
 	}
