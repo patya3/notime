@@ -1,10 +1,16 @@
 package mainPage
 
 import (
+	"log"
+
 	"github.com/gdamore/tcell/v2"
+	"github.com/patya3/notime/pkg/models/note"
+	"github.com/patya3/notime/pkg/tui/constants"
 	"github.com/patya3/notime/pkg/tui/helpers"
 	"github.com/rivo/tview"
 )
+
+var notes = make([]note.Note, 0)
 
 func InitNotesList(app *tview.Application) {
 
@@ -27,6 +33,17 @@ func InitNotesList(app *tview.Application) {
 		}).
 		SetInputCapture(helpers.RedifineUpAndDown)
 
-	NoteList.AddItem("Szia", "minden rendben", 0, nil)
-	NoteList.AddItem("Szia", "minden rendben", 0, nil)
+	InitNoteListElements()
+}
+
+func InitNoteListElements() {
+	var err error
+	NoteList.Clear()
+	notes, err = constants.NoteRepo.GetAllNotes()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, note := range notes {
+		NoteList.AddItem(note.Title, "", 0, nil)
+	}
 }

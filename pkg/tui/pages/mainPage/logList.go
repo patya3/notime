@@ -8,6 +8,7 @@ import (
 	"github.com/patya3/notime/pkg/tui/constants"
 	"github.com/patya3/notime/pkg/tui/helpers"
 	"github.com/patya3/notime/pkg/tui/pages/logModal"
+	// "github.com/patya3/notime/pkg/tui/pages/notification"
 	"github.com/rivo/tview"
 )
 
@@ -44,7 +45,25 @@ func InitLogList(list *tview.List, logType string, pagePrimitive *tview.Pages) {
 				logModal.SetLogModalText(quickLogs[i].ID)
 			}
 		}).
-		SetInputCapture(helpers.RedifineUpAndDown)
+		SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+			// NOTE: not working correctly at the moment:
+			// dont take notes after copy and display comment on running time
+			switch event.Rune() {
+			case 'c':
+				currentIssueId := issues[IssueList.GetCurrentItem()].ID
+				currentLogId := issueLogs[list.GetCurrentItem()].ID
+
+				copiedTimeLog, err := constants.LogRepo.CopyTimerByLogAndIssueId(currentLogId, currentIssueId)
+				if err != nil {
+					log.Fatal(err)
+					// notification.SetNotification("Something went wrong cannot copy Log.")
+					// pagePrimitive.ShowPage("Notification")
+				}
+				LogList.InsertItem(0, copiedTimeLog.Title(), copiedTimeLog.Comment, 0, nil)
+				break
+			}
+			return helpers.RedifineUpAndDown(event)
+		})
 }
 
 func InitLogListElements(issueID uint) {

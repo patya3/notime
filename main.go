@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm/logger"
 
 	"github.com/patya3/notime/pkg/models/issue"
+	"github.com/patya3/notime/pkg/models/note"
 	"github.com/patya3/notime/pkg/models/project"
 	"github.com/patya3/notime/pkg/models/timelog"
 	"github.com/patya3/notime/pkg/tui"
@@ -77,7 +78,7 @@ func openSqlite() *gorm.DB {
 	if err != nil {
 		log.Fatalf("unable to open database: %v", err)
 	}
-	err = db.AutoMigrate(&project.Project{}, &issue.Issue{}, &timelog.Log{})
+	err = db.AutoMigrate(&project.Project{}, &issue.Issue{}, &timelog.Log{}, &note.Note{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -89,11 +90,14 @@ func main() {
 	projectRepo := project.ProjectRepo{DB: db}
 	issueRepo := issue.IssueRepo{DB: db}
 	logRepo := timelog.LogRepo{DB: db}
+	noteRepo := note.NoteRepo{DB: db}
 
 	constants.IssueRepo = &issueRepo
 	constants.LogRepo = &logRepo
 	constants.ProjectRepo = &projectRepo
+	constants.NoteRepo = &noteRepo
 	projectRepo.CreateProject("VM", "Virtual Microscope")
 	projectRepo.CreateProject("IDV", "IDV")
+
 	tui.StartTui()
 }

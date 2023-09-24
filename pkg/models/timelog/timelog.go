@@ -3,6 +3,7 @@ package timelog
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 
 	c "github.com/patya3/notime/pkg/colors"
@@ -74,6 +75,26 @@ func (g *LogRepo) StopTimerByLogId(logID uint) (Log, error) {
 		return log, fmt.Errorf("Cannot stop timer: %v", err)
 	}
 	return log, nil
+}
+
+func (g *LogRepo) CopyTimerByLogAndIssueId(logID uint, issueID uint) (Log, error) {
+	var oldLog Log
+	log.Println("logId", logID)
+	err := g.DB.Model(&oldLog).Where("id = ?", logID).Error
+	if err != nil {
+		return oldLog, fmt.Errorf("Cannot continue timer (log not found): %v", err)
+	}
+
+	newLog := Log{IssueID: sql.NullInt32{
+		Int32: int32(issueID), Valid: true},
+		Comment: oldLog.Comment,
+		Logged:  oldLog.Logged,
+	}
+	if err := g.DB.Create(&newLog).Error; err != nil {
+		return newLog, fmt.Errorf("Cannot create copy log: %v", err)
+	}
+
+	return newLog, nil
 }
 
 func (g *LogRepo) StopTimerByIssueId(issueID sql.NullInt32, comment string) (Log, error) {
