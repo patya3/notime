@@ -2,7 +2,6 @@ package note
 
 import (
 	"fmt"
-	"log"
 
 	"gorm.io/gorm"
 )

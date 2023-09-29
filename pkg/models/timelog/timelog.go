@@ -140,6 +140,15 @@ func (g *LogRepo) GetAllQuickLogs() ([]Log, error) {
 	return logs, nil
 }
 
+func (g *LogRepo) GetQuickLogByID(id uint) (Log, error) {
+	var log Log
+	if err := g.DB.Model(&log).Where("id = ?", id).First(&log).Error; err != nil {
+		// NOTE: maybe return with null pointer would be better
+		return log, fmt.Errorf("No log found with the given ID: %v", err)
+	}
+	return log, nil
+}
+
 func (g *LogRepo) GetLogByID(id uint) (extendedLog, error) {
 	var log extendedLog
 	var l Log

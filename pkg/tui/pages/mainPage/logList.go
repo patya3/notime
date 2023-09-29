@@ -40,9 +40,9 @@ func InitLogList(list *tview.List, logType string, pagePrimitive *tview.Pages) {
 		SetSelectedFunc(func(i int, s1, s2 string, r rune) {
 			pagePrimitive.ShowPage("Log")
 			if logType == "ISSUE_LOG" {
-				logModal.SetLogModalText(issueLogs[i].ID)
+				logModal.SetLogModalTextIssueLog(issueLogs[i].ID)
 			} else if logType == "QUICK_LOG" {
-				logModal.SetLogModalText(quickLogs[i].ID)
+				logModal.SetLogModalTextForQuickLog(quickLogs[i].ID)
 			}
 		}).
 		SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {

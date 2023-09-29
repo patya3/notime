@@ -41,10 +41,18 @@ func InitLogModal(pagePrimitive *tview.Pages) *tview.Grid {
 	return modal(logModal, 40, 20)
 }
 
-func SetLogModalText(logID uint) {
+func SetLogModalTextIssueLog(logID uint) {
 	extendedTimelog, err := constants.LogRepo.GetLogByID(logID)
 	if err != nil {
 		log.Fatal(err)
 	}
 	logModal.SetText(fmt.Sprintf("Issue: %s%s\n\n%s\n[lightgreen]%s\n\n%s%s", extendedTimelog.IssueKey, extendedTimelog.IssueTitle, extendedTimelog.Title(), extendedTimelog.Description(), c.Colors["white"], extendedTimelog.Comment))
+}
+
+func SetLogModalTextForQuickLog(quickLogID uint) {
+	quickLog, err := constants.LogRepo.GetQuickLogByID(quickLogID)
+	if err != nil {
+		log.Fatal(err)
+	}
+	logModal.SetText(fmt.Sprintf("%s\n[lightgreen]%s\n\n%s%s", quickLog.Title(), quickLog.Description(), c.Colors["white"], quickLog.Comment))
 }
