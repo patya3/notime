@@ -1,7 +1,6 @@
 package mainPage
 
 import (
-	"database/sql"
 	"log"
 
 	"github.com/gdamore/tcell/v2"
@@ -40,23 +39,32 @@ func InitMainPage(app *tview.Application, pagePrimitive *tview.Pages) *tview.Fle
 			app.SetFocus(QuickLogList)
 			break
 		case 'A':
-			timelog, err := constants.LogRepo.StartTimer(sql.NullInt32{})
+			hasRunningQuickLog, err := constants.LogRepo.HasRunningLogQuickLog()
 			if err != nil {
 				log.Fatal(err)
 			}
-			QuickLogList.InsertItem(0, timelog.Title(), timelog.Comment, 0, nil)
+			if hasRunningQuickLog {
+				notification.SetNotification("There is a running quick log")
+				pagePrimitive.ShowPage("Notification")
+			} else {
+				pagePrimitive.ShowPage("AddQuickLogText")
+			}
 			break
 		case 'S':
-			hasRunningLog, err := constants.LogRepo.HasRunningLog(sql.NullInt32{})
+			hasRunningQuickLog, err := constants.LogRepo.HasRunningLogQuickLog()
 			if err != nil {
 				log.Fatal(err)
 			}
-			if !hasRunningLog {
+			if !hasRunningQuickLog {
 				notification.SetNotification("There are no running quick logs")
 				pagePrimitive.ShowPage("Notification")
 			} else {
-				SelectedIssueId.Scan(nil)
-				pagePrimitive.ShowPage("AddComment")
+				// TODO: maybe need a confirmation and a comment rewrite if needed (load old comment from database)
+				_, err := constants.LogRepo.StopTimerForQuickLog()
+				if err != nil {
+					log.Fatal(err)
+				}
+				InitQuickLogListElements()
 			}
 			break
 		}
@@ -66,10 +74,10 @@ func InitMainPage(app *tview.Application, pagePrimitive *tview.Pages) *tview.Fle
 	MainPageContainer.
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 			AddItem(IssueList, 0, 7, true).
-			AddItem(NoteList, 0, 5, true), 0, 8, true).
+			AddItem(NoteList, 0, 5, true), 0, 7, true).
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 			AddItem(LogList, 0, 7, false).
-			AddItem(QuickLogList, 0, 5, false), 0, 4, true)
+			AddItem(QuickLogList, 0, 5, false), 0, 5, true)
 
 	return MainPageContainer
 }

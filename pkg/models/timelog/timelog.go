@@ -68,10 +68,27 @@ func (g *LogRepo) StartTimer(issueID sql.NullInt32) (Log, error) {
 	return log, nil
 }
 
+func (g *LogRepo) StartTimerForQuickLog(comment string) (Log, error) {
+	var log Log
+	log = Log{Comment: comment}
+	if err := g.DB.Create(&log).Error; err != nil {
+		return log, fmt.Errorf("Cannot start timer: %v", err)
+	}
+	return log, nil
+}
+
 func (g *LogRepo) StopTimerByLogId(logID uint) (Log, error) {
 	var log Log
 	err := g.DB.Model(&log).Where("id = ?", logID).Update("StoppedAt", time.Now()).Error
 	if err != nil {
+		return log, fmt.Errorf("Cannot stop timer: %v", err)
+	}
+	return log, nil
+}
+
+func (g *LogRepo) StopTimerForQuickLog() (Log, error) {
+	var log Log
+	if err := g.DB.Model(&log).Where("issue_id IS NULL AND stopped_at IS NULL").Update("StoppedAt", time.Now()).Error; err != nil {
 		return log, fmt.Errorf("Cannot stop timer: %v", err)
 	}
 	return log, nil
@@ -120,6 +137,17 @@ func (g *LogRepo) HasRunningLog(issueID sql.NullInt32) (bool, error) {
 	err := query.Error
 	if err != nil {
 		return false, fmt.Errorf("Cannot stop timer: %v", err)
+	}
+	return count > 0, nil
+}
+
+func (g *LogRepo) HasRunningLogQuickLog() (bool, error) {
+	var count int64
+	var log Log
+
+	query := g.DB.Model(&log).Where("issue_id IS NULL AND stopped_at IS NULL").Count(&count)
+	if query.Error != nil {
+		return false, fmt.Errorf("Query failed: %v", query.Error)
 	}
 	return count > 0, nil
 }

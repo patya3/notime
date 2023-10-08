@@ -2,6 +2,7 @@ package mainPage
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/gdamore/tcell/v2"
@@ -82,11 +83,12 @@ func InitIssueList(app *tview.Application, pagePrimitive *tview.Pages) {
 				if err != nil {
 					log.Fatal(err)
 				}
-				if !hasRunningLog {
+				if hasRunningLog {
+					fmt.Println("hello", currentIssueId)
+					pagePrimitive.ShowPage("AddComment")
+				} else {
 					notification.SetNotification("This Issue hasn't got a running log.")
 					pagePrimitive.ShowPage("Notification")
-				} else {
-					pagePrimitive.ShowPage("AddComment")
 				}
 			}
 			return helpers.RedifineUpAndDown(event)

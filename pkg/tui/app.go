@@ -28,7 +28,8 @@ func StartTui() {
 		AddPage("Main", mainPage.InitMainPage(app, pagePrimitive), true, true).
 		AddPage("AddIssue", addIssueModal.InitAddIssueForm(app, pagePrimitive), true, false).
 		AddPage("Notification", notification.InitNotification(pagePrimitive), true, false).
-		AddPage("AddComment", commentModal.InitCommentModal(pagePrimitive), true, false).
+		AddPage("AddComment", commentModal.InitCommentModal(pagePrimitive, "ISSUE_LOG"), true, false).
+		AddPage("AddQuickLogText", commentModal.InitCommentModal(pagePrimitive, "QUICK_LOG"), true, false).
 		AddPage("Log", logModal.InitLogModal(pagePrimitive), true, false)
 
 	if err := app.SetRoot(pagePrimitive, true).EnableMouse(true).Run(); err != nil {
