@@ -19,7 +19,7 @@ func InitMainPage(app *tview.Application, pagePrimitive *tview.Pages) *tview.Fle
 	MainPageContainer.SetBackgroundColor(tcell.ColorDefault)
 
 	InitIssueList(app, pagePrimitive)
-	InitNotesList(app)
+	InitNotesList(app, pagePrimitive)
 	InitLogList(LogList, "ISSUE_LOG", pagePrimitive)
 	InitLogList(QuickLogList, "QUICK_LOG", pagePrimitive)
 	InitQuickLogListElements()

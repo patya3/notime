@@ -54,6 +54,8 @@ func InitIssueList(app *tview.Application, pagePrimitive *tview.Pages) {
 			switch event.Rune() {
 			case 'c':
 				pagePrimitive.ShowPage("AddIssue")
+			case 'n':
+				pagePrimitive.ShowPage("AddNote")
 			case 'a':
 				if len(issues) == 0 {
 					notification.SetNotification("Create an issue first with the letter 'c'.")
@@ -83,6 +85,8 @@ func InitIssueList(app *tview.Application, pagePrimitive *tview.Pages) {
 				if err != nil {
 					log.Fatal(err)
 				}
+				// TODO: get the actual log instead of boolean,
+				// to be able to fill the commentModal with the existing text, if the log was coppied
 				if hasRunningLog {
 					fmt.Println("hello", currentIssueId)
 					pagePrimitive.ShowPage("AddComment")

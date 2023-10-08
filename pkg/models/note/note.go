@@ -30,14 +30,22 @@ func (g *NoteRepo) GetNoteByID(id uint) (Note, error) {
 
 func (g *NoteRepo) GetAllNotes() ([]Note, error) {
 	var notes []Note
-	if err := g.DB.Find(&notes).Error; err != nil {
+	if err := g.DB.Order("created_at desc").Find(&notes).Error; err != nil {
 		return notes, fmt.Errorf("No notes found: %v", err)
 	}
 	return notes, nil
 }
 
-func (g *NoteRepo) CreateNote(title string, description string) (Note, error) {
-	note := Note{Title: title, Description: description}
+func (g *NoteRepo) GetAllNoteIds() ([]int, error) {
+	var noteIds []int
+	var note Note
+	if err := g.DB.Model(&note).Order("created_at desc").Select([]string{"id"}).Find(&noteIds).Error; err != nil {
+		return noteIds, fmt.Errorf("No notes found: %v", err)
+	}
+	return noteIds, nil
+}
+
+func (g *NoteRepo) CreateNote(note Note) (Note, error) {
 	if err := g.DB.Create(&note).Error; err != nil {
 		return note, fmt.Errorf("Cannot create note: %v", err)
 	}

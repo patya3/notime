@@ -1,7 +1,6 @@
 package commentModal
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/gdamore/tcell/v2"
@@ -30,7 +29,6 @@ func InitCommentModal(pagePrimitive *tview.Pages, modalType string) *tview.Grid 
 	}
 
 	var title string
-	fmt.Println("modalType", modalType)
 	if modalType == "ISSUE_LOG" {
 		title = "Add log comment"
 	} else {

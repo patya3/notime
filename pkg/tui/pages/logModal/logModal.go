@@ -1,5 +1,10 @@
 package logModal
 
+// TODO: edit logModal and change it to a form which has the followings
+// StoppedAt => a field which show the elapsed time in the following format (HH:MM:SS)
+//           => and calculate the new StoppedAt from that and CreatedAt
+// Comment   string
+
 import (
 	"fmt"
 	"log"

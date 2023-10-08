@@ -3,7 +3,6 @@ package timelog
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"time"
 
 	c "github.com/patya3/notime/pkg/colors"
@@ -96,7 +95,6 @@ func (g *LogRepo) StopTimerForQuickLog() (Log, error) {
 
 func (g *LogRepo) CopyTimerByLogAndIssueId(logID uint, issueID uint) (Log, error) {
 	var oldLog Log
-	log.Println("logId", logID)
 	err := g.DB.Model(&oldLog).Where("id = ?", logID).Error
 	if err != nil {
 		return oldLog, fmt.Errorf("Cannot continue timer (log not found): %v", err)
@@ -129,7 +127,7 @@ func (g *LogRepo) StopTimerByIssueId(issueID sql.NullInt32, comment string) (Log
 
 func (g *LogRepo) HasRunningLog(issueID sql.NullInt32) (bool, error) {
 	var count int64
-	var log Log
+	var log *Log
 	query := g.DB.Model(&log).Where("issue_id = ? AND stopped_at IS NULL", issueID).Count(&count)
 	if !issueID.Valid {
 		query = g.DB.Model(&log).Where("issue_id IS NULL AND stopped_at IS NULL").Count(&count)
@@ -180,7 +178,13 @@ func (g *LogRepo) GetQuickLogByID(id uint) (Log, error) {
 func (g *LogRepo) GetLogByID(id uint) (extendedLog, error) {
 	var log extendedLog
 	var l Log
-	if err := g.DB.Model(&l).Select("logs.*, issues.issue_title, issues.issue_key").Joins("INNER JOIN issues ON logs.issue_id = issues.id").Where("logs.id = ?", id).First(&log).Error; err != nil {
+	if err := g.DB.Model(&l).
+		Select("logs.*, issues.issue_title, issues.issue_key").
+		Joins("INNER JOIN issues ON logs.issue_id = issues.id").
+		Where("logs.id = ?", id).
+		First(&log).
+		Error; err != nil {
+
 		return log, fmt.Errorf("No log found with the given ID: %v", err)
 	}
 	return log, nil

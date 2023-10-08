@@ -7,12 +7,13 @@ import (
 	"github.com/patya3/notime/pkg/models/note"
 	"github.com/patya3/notime/pkg/tui/constants"
 	"github.com/patya3/notime/pkg/tui/helpers"
+	"github.com/patya3/notime/pkg/tui/pages/noteModal"
 	"github.com/rivo/tview"
 )
 
 var notes = make([]note.Note, 0)
 
-func InitNotesList(app *tview.Application) {
+func InitNotesList(app *tview.Application, pagePrimitive *tview.Pages) {
 
 	NoteList.
 		SetBorder(true).
@@ -29,7 +30,8 @@ func InitNotesList(app *tview.Application) {
 		ShowSecondaryText(false).
 		SetSelectedBackgroundColor(tcell.ColorLightPink.TrueColor()).
 		SetSelectedFunc(func(i int, s1, s2 string, r rune) {
-			// app.SetFocus(notesList)
+			pagePrimitive.ShowPage("Note")
+			noteModal.SetNoteModalText(notes[i].ID)
 		}).
 		SetInputCapture(helpers.RedifineUpAndDown)
 

@@ -1,6 +1,7 @@
 package mainPage
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/gdamore/tcell/v2"
@@ -8,6 +9,8 @@ import (
 	"github.com/patya3/notime/pkg/tui/constants"
 	"github.com/patya3/notime/pkg/tui/helpers"
 	"github.com/patya3/notime/pkg/tui/pages/logModal"
+	"github.com/patya3/notime/pkg/tui/pages/notification"
+
 	// "github.com/patya3/notime/pkg/tui/pages/notification"
 	"github.com/rivo/tview"
 )
@@ -46,9 +49,9 @@ func InitLogList(list *tview.List, logType string, pagePrimitive *tview.Pages) {
 			}
 		}).
 		SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+			switch event.Rune() {
 			// NOTE: not working correctly at the moment:
 			// dont take notes after copy and display comment on running time
-			switch event.Rune() {
 			case 'c':
 				currentIssueId := issues[IssueList.GetCurrentItem()].ID
 				currentLogId := issueLogs[list.GetCurrentItem()].ID
@@ -61,6 +64,16 @@ func InitLogList(list *tview.List, logType string, pagePrimitive *tview.Pages) {
 				}
 				LogList.InsertItem(0, copiedTimeLog.Title(), copiedTimeLog.Comment, 0, nil)
 				break
+			case 'u':
+				// NOTE: UPDATE
+				currentLogId := issueLogs[list.GetCurrentItem()].ID
+				log, err := constants.LogRepo.GetLogByID(currentLogId)
+				if err != nil {
+					pagePrimitive.ShowPage("Notification")
+					notification.SetNotification("Log not found")
+				}
+				fmt.Println(log)
+
 			}
 			return helpers.RedifineUpAndDown(event)
 		})
