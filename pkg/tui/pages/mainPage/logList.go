@@ -19,7 +19,7 @@ var issueLogs = make([]timelog.Log, 0)
 var quickLogs = make([]timelog.Log, 0)
 
 // @param logType = "ISSUE_LOG" | "QUICK_LOG"
-func InitLogList(list *tview.List, logType string, pagePrimitive *tview.Pages) {
+func InitLogList(list *tview.List, logType string, app *tview.Application, pagePrimitive *tview.Pages) {
 	title := "Logs"
 	if logType == "QUICK_LOG" {
 		title = "Quick Logs"
@@ -43,7 +43,9 @@ func InitLogList(list *tview.List, logType string, pagePrimitive *tview.Pages) {
 		SetSelectedFunc(func(i int, s1, s2 string, r rune) {
 			pagePrimitive.ShowPage("Log")
 			if logType == "ISSUE_LOG" {
-				logModal.SetLogModalTextIssueLog(issueLogs[i].ID)
+				// logModal.SetLogModalTextIssueLog(issueLogs[i].ID)
+				logModal.InitFormElements(pagePrimitive, &issueLogs[i].ID)
+				app.SetFocus(logModal.LogModalForm)
 			} else if logType == "QUICK_LOG" {
 				logModal.SetLogModalTextForQuickLog(quickLogs[i].ID)
 			}

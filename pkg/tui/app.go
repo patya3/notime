@@ -33,7 +33,7 @@ func StartTui() {
 		AddPage("Notification", notification.InitNotification(pagePrimitive), true, false).
 		AddPage("AddComment", commentModal.InitCommentModal(pagePrimitive, "ISSUE_LOG"), true, false).
 		AddPage("AddQuickLogText", commentModal.InitCommentModal(pagePrimitive, "QUICK_LOG"), true, false).
-		AddPage("Log", logModal.InitLogModal(pagePrimitive), true, false).
+		AddPage("Log", logModal.InitLogModal(app, pagePrimitive), true, false).
 		AddPage("Note", noteModal.InitNoteModal(app, pagePrimitive, mainPage.NoteList), true, false)
 
 	if err := app.SetRoot(pagePrimitive, true).EnableMouse(true).Run(); err != nil {

@@ -2,7 +2,6 @@ package mainPage
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 
 	"github.com/gdamore/tcell/v2"
@@ -88,7 +87,6 @@ func InitIssueList(app *tview.Application, pagePrimitive *tview.Pages) {
 				// TODO: get the actual log instead of boolean,
 				// to be able to fill the commentModal with the existing text, if the log was coppied
 				if hasRunningLog {
-					fmt.Println("hello", currentIssueId)
 					pagePrimitive.ShowPage("AddComment")
 				} else {
 					notification.SetNotification("This Issue hasn't got a running log.")

@@ -20,8 +20,8 @@ func InitMainPage(app *tview.Application, pagePrimitive *tview.Pages) *tview.Fle
 
 	InitIssueList(app, pagePrimitive)
 	InitNotesList(app, pagePrimitive)
-	InitLogList(LogList, "ISSUE_LOG", pagePrimitive)
-	InitLogList(QuickLogList, "QUICK_LOG", pagePrimitive)
+	InitLogList(LogList, "ISSUE_LOG", app, pagePrimitive)
+	InitLogList(QuickLogList, "QUICK_LOG", app, pagePrimitive)
 	InitQuickLogListElements()
 
 	MainPageContainer.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {

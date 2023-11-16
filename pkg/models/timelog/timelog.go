@@ -17,7 +17,7 @@ type Log struct {
 	Logged    bool
 }
 
-type extendedLog struct {
+type ExtendedLog struct {
 	Log
 	IssueTitle string
 	IssueKey   string
@@ -175,8 +175,8 @@ func (g *LogRepo) GetQuickLogByID(id uint) (Log, error) {
 	return log, nil
 }
 
-func (g *LogRepo) GetLogByID(id uint) (extendedLog, error) {
-	var log extendedLog
+func (g *LogRepo) GetLogByID(id uint) (ExtendedLog, error) {
+	var log ExtendedLog
 	var l Log
 	if err := g.DB.Model(&l).
 		Select("logs.*, issues.issue_title, issues.issue_key").
