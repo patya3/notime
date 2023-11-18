@@ -8,6 +8,7 @@ import (
 	"github.com/patya3/notime/pkg/tui/pages/logModal"
 	"github.com/patya3/notime/pkg/tui/pages/mainPage"
 	"github.com/patya3/notime/pkg/tui/pages/noteModal"
+	"github.com/patya3/notime/pkg/tui/pages/notePage"
 	"github.com/patya3/notime/pkg/tui/pages/notification"
 	"github.com/rivo/tview"
 )
@@ -34,7 +35,8 @@ func StartTui() {
 		AddPage("AddComment", commentModal.InitCommentModal(pagePrimitive, "ISSUE_LOG"), true, false).
 		AddPage("AddQuickLogText", commentModal.InitCommentModal(pagePrimitive, "QUICK_LOG"), true, false).
 		AddPage("Log", logModal.InitLogModal(app, pagePrimitive), true, false).
-		AddPage("Note", noteModal.InitNoteModal(app, pagePrimitive, mainPage.NoteList), true, false)
+		AddPage("Note", noteModal.InitNoteModal(app, pagePrimitive, notePage.NoteList), true, false).
+		AddPage("NotePage", notePage.InitNotePage(app, pagePrimitive), true, false)
 
 	if err := app.SetRoot(pagePrimitive, true).EnableMouse(true).Run(); err != nil {
 		panic(err)

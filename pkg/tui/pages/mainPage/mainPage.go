@@ -5,6 +5,7 @@ import (
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/patya3/notime/pkg/tui/constants"
+	"github.com/patya3/notime/pkg/tui/pages/notePage"
 	"github.com/patya3/notime/pkg/tui/pages/notification"
 	"github.com/rivo/tview"
 )
@@ -12,14 +13,12 @@ import (
 var MainPageContainer = tview.NewFlex()
 var IssueList = tview.NewList()
 var LogList = tview.NewList()
-var NoteList = tview.NewList()
 var QuickLogList = tview.NewList()
 
 func InitMainPage(app *tview.Application, pagePrimitive *tview.Pages) *tview.Flex {
 	MainPageContainer.SetBackgroundColor(tcell.ColorDefault)
 
 	InitIssueList(app, pagePrimitive)
-	InitNotesList(app, pagePrimitive)
 	InitLogList(LogList, "ISSUE_LOG", app, pagePrimitive)
 	InitLogList(QuickLogList, "QUICK_LOG", app, pagePrimitive)
 	InitQuickLogListElements()
@@ -33,10 +32,11 @@ func InitMainPage(app *tview.Application, pagePrimitive *tview.Pages) *tview.Fle
 			app.SetFocus(LogList)
 			break
 		case '3':
-			app.SetFocus(NoteList)
+			app.SetFocus(QuickLogList)
 			break
 		case '4':
-			app.SetFocus(QuickLogList)
+			pagePrimitive.ShowPage("NotePage")
+			app.SetFocus(notePage.NoteList)
 			break
 		case 'A':
 			hasRunningQuickLog, err := constants.LogRepo.HasRunningLogQuickLog()
@@ -73,8 +73,7 @@ func InitMainPage(app *tview.Application, pagePrimitive *tview.Pages) *tview.Fle
 
 	MainPageContainer.
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-			AddItem(IssueList, 0, 7, true).
-			AddItem(NoteList, 0, 5, true), 0, 7, true).
+			AddItem(IssueList, 0, 7, true), /* AddItem(NoteList, 0, 5, true) */ 0, 7, true).
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 			AddItem(LogList, 0, 7, false).
 			AddItem(QuickLogList, 0, 5, false), 0, 5, true)

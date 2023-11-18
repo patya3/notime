@@ -4,7 +4,8 @@ import (
 	"github.com/gdamore/tcell/v2"
 	noteModel "github.com/patya3/notime/pkg/models/note"
 	"github.com/patya3/notime/pkg/tui/constants"
-	"github.com/patya3/notime/pkg/tui/pages/mainPage"
+
+	"github.com/patya3/notime/pkg/tui/pages/notePage"
 	"github.com/patya3/notime/pkg/tui/pages/notification"
 	"github.com/rivo/tview"
 )
@@ -60,7 +61,7 @@ func initFormElements(noteForm *tview.Form, app *tview.Application, pagePrimitiv
 				notification.SetNotification(err.Error())
 				pagePrimitive.ShowPage("Notification")
 			}
-			mainPage.InitNoteListElements()
+			notePage.InitNoteListElements()
 			pagePrimitive.HidePage("AddNote")
 		}).
 		AddButton("Quit", func() {
