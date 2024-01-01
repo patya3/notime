@@ -44,10 +44,12 @@ func InitLogList(list *tview.List, logType string, app *tview.Application, pageP
 			pagePrimitive.ShowPage("Log")
 			if logType == "ISSUE_LOG" {
 				// logModal.SetLogModalTextIssueLog(issueLogs[i].ID)
-				logModal.InitFormElements(pagePrimitive, &issueLogs[i].ID)
+				logModal.InitFormElements(app, pagePrimitive, logType, &issueLogs[i].ID)
 				app.SetFocus(logModal.LogModalForm)
 			} else if logType == "QUICK_LOG" {
-				logModal.SetLogModalTextForQuickLog(quickLogs[i].ID)
+				// logModal.SetLogModalTextForQuickLog(quickLogs[i].ID)
+				logModal.InitFormElements(app, pagePrimitive, logType, &quickLogs[i].ID)
+				app.SetFocus(logModal.LogModalForm)
 			}
 		}).
 		SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
@@ -61,8 +63,6 @@ func InitLogList(list *tview.List, logType string, app *tview.Application, pageP
 				copiedTimeLog, err := constants.LogRepo.CopyTimerByLogAndIssueId(currentLogId, currentIssueId)
 				if err != nil {
 					log.Fatal(err)
-					// notification.SetNotification("Something went wrong cannot copy Log.")
-					// pagePrimitive.ShowPage("Notification")
 				}
 				LogList.InsertItem(0, copiedTimeLog.Title(), copiedTimeLog.Comment, 0, nil)
 				break

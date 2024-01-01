@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
+	"github.com/joho/godotenv"
 	"github.com/patya3/notime/pkg/models/issue"
 	"github.com/patya3/notime/pkg/models/note"
 	"github.com/patya3/notime/pkg/models/project"
@@ -28,6 +29,7 @@ func createFileLogger(homeDir string) (logger.Interface, error) {
 
 	return logger.New(
 		log.New(file, "\r\n", log.LstdFlags), // io writer
+
 		logger.Config{
 			SlowThreshold:             time.Second,   // Slow SQL threshold
 			LogLevel:                  logger.Silent, // Log level
@@ -86,6 +88,12 @@ func openSqlite() *gorm.DB {
 }
 
 func main() {
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	db := openSqlite()
 	projectRepo := project.ProjectRepo{DB: db}
 	issueRepo := issue.IssueRepo{DB: db}

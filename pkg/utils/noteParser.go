@@ -2,7 +2,9 @@ package utils
 
 import (
 	"bytes"
+	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -17,9 +19,11 @@ type Hit struct {
 
 func ParseVimNotes() ([]Hit, error) {
 
+	folderToScan := os.Getenv("FOLDER_TO_SCAN")
+
 	args := []string{
 		"// NOTE: ",
-		"/home/pmeszaros/aensys_work/",
+		folderToScan,
 		"-A",
 		"10",
 		"--no-ignore",
@@ -65,7 +69,8 @@ func ParseVimNotes() ([]Hit, error) {
 		var err error
 		var context bytes.Buffer
 
-		path, note = firstLine[0], strings.TrimSpace(firstLine[3])
+		path, note = firstLine[0], firstLine[3]
+		fmt.Println("spaces", firstLine[2], "note", firstLine[3])
 		lineNumber, err = strconv.Atoi(firstLine[1])
 		if err != nil {
 			log.Fatal(err)

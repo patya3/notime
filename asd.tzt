@@ -1,0 +1,146 @@
+pkg/utils/noteParser.go-	LineNumber int
+pkg/utils/noteParser.go-	Path       string
+pkg/utils/noteParser.go-	Context    string
+pkg/utils/noteParser.go-}
+pkg/utils/noteParser.go-
+pkg/utils/noteParser.go-func ParseVimNotes() ([]Hit, error) {
+pkg/utils/noteParser.go-
+pkg/utils/noteParser.go-	folderToScan := os.Getenv("FOLDER_TO_SCAN")
+pkg/utils/noteParser.go-
+pkg/utils/noteParser.go-	args := []string{
+pkg/utils/noteParser.go:		"// NOTE: ",
+pkg/utils/noteParser.go-		folderToScan,
+pkg/utils/noteParser.go-		"-A",
+pkg/utils/noteParser.go-		"10",
+pkg/utils/noteParser.go-		"--no-ignore",
+pkg/utils/noteParser.go-		"-g",
+pkg/utils/noteParser.go-		"!node_modules",
+pkg/utils/noteParser.go-		"-g",
+pkg/utils/noteParser.go-		"!build",
+pkg/utils/noteParser.go-		"-g",
+pkg/utils/noteParser.go-		"!public",
+--
+pkg/tui/app.go-
+pkg/tui/app.go-	pagePrimitive.Box.
+pkg/tui/app.go-		SetBackgroundColor(tcell.ColorDefault).
+pkg/tui/app.go-		SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+pkg/tui/app.go-			if event.Rune() == 'q' && mainPage.MainPageContainer.HasFocus() {
+pkg/tui/app.go-				app.Stop()
+pkg/tui/app.go-			}
+pkg/tui/app.go-			return event
+pkg/tui/app.go-		})
+pkg/tui/app.go-
+pkg/tui/app.go:		// NOTE: test
+pkg/tui/app.go-	pagePrimitive.
+pkg/tui/app.go-		AddPage("Main", mainPage.InitMainPage(app, pagePrimitive), true, true).
+pkg/tui/app.go-		AddPage("AddIssue", addIssueModal.InitAddIssueForm(app, pagePrimitive), true, false).
+pkg/tui/app.go-		AddPage("AddNote", addNoteModal.InitAddNoteModal(app, pagePrimitive), true, false).
+pkg/tui/app.go-		AddPage("Notification", notification.InitNotification(pagePrimitive), true, false).
+pkg/tui/app.go-		AddPage("AddComment", commentModal.InitCommentModal(pagePrimitive, "ISSUE_LOG"), true, false).
+pkg/tui/app.go-		AddPage("AddQuickLogText", commentModal.InitCommentModal(pagePrimitive, "QUICK_LOG"), true, false).
+pkg/tui/app.go-		AddPage("Log", logModal.InitLogModal(app, pagePrimitive), true, false).
+pkg/tui/app.go-		AddPage("NotePage", notePage.InitNotePage(app, pagePrimitive), true, false).
+pkg/tui/app.go-		AddPage("Note", noteModal.InitNoteModal(app, pagePrimitive, notePage.NoteList), true, false)
+--
+pkg/models/timelog/timelog.go-	var logs []Log
+pkg/models/timelog/timelog.go-	if err := g.DB.Where("issue_id IS NULL").Order("created_at desc").Find(&logs).Error; err != nil {
+pkg/models/timelog/timelog.go-		return logs, fmt.Errorf("No logs found: %v", err)
+pkg/models/timelog/timelog.go-	}
+pkg/models/timelog/timelog.go-	return logs, nil
+pkg/models/timelog/timelog.go-}
+pkg/models/timelog/timelog.go-
+pkg/models/timelog/timelog.go-func (g *LogRepo) GetQuickLogByID(id uint) (Log, error) {
+pkg/models/timelog/timelog.go-	var log Log
+pkg/models/timelog/timelog.go-	if err := g.DB.Model(&log).Where("id = ?", id).First(&log).Error; err != nil {
+pkg/models/timelog/timelog.go:		// NOTE: maybe return with null pointer would be better
+pkg/models/timelog/timelog.go-		return log, fmt.Errorf("No log found with the given ID: %v", err)
+pkg/models/timelog/timelog.go-	}
+pkg/models/timelog/timelog.go-	return log, nil
+pkg/models/timelog/timelog.go-}
+pkg/models/timelog/timelog.go-
+pkg/models/timelog/timelog.go-func (g *LogRepo) GetLogByID(id uint) (ExtendedLog, error) {
+pkg/models/timelog/timelog.go-	var log ExtendedLog
+pkg/models/timelog/timelog.go-	var l Log
+pkg/models/timelog/timelog.go-	if err := g.DB.Model(&l).
+pkg/models/timelog/timelog.go-		Select("logs.*, issues.issue_title, issues.issue_key").
+--
+pkg/tui/pages/logModal/logModal.go-				return nil
+pkg/tui/pages/logModal/logModal.go-			}
+pkg/tui/pages/logModal/logModal.go-			return event
+pkg/tui/pages/logModal/logModal.go-		})
+pkg/tui/pages/logModal/logModal.go-
+pkg/tui/pages/logModal/logModal.go-	// logModal.
+pkg/tui/pages/logModal/logModal.go-	// 	SetTextColor(tcell.ColorIndianRed).
+pkg/tui/pages/logModal/logModal.go-	// 	SetDynamicColors(true).
+pkg/tui/pages/logModal/logModal.go-	// 	SetBackgroundColor(tcell.ColorDefault)
+pkg/tui/pages/logModal/logModal.go-
+pkg/tui/pages/logModal/logModal.go:	// NOTE: not sure if this line is needed
+pkg/tui/pages/logModal/logModal.go-	InitFormElements(pagePrimitive, nil)
+pkg/tui/pages/logModal/logModal.go-
+pkg/tui/pages/logModal/logModal.go-	return modalLocal(LogModalForm, 50, 30)
+pkg/tui/pages/logModal/logModal.go-}
+pkg/tui/pages/logModal/logModal.go-
+pkg/tui/pages/logModal/logModal.go-func InitFormElements( /* app *tview.Application, */ pagePrimitive *tview.Pages, logID *uint) {
+pkg/tui/pages/logModal/logModal.go-	LogModalForm.Clear(true)
+pkg/tui/pages/logModal/logModal.go-
+pkg/tui/pages/logModal/logModal.go-	var extendedTimelog logModel.ExtendedLog
+pkg/tui/pages/logModal/logModal.go-	if logID != nil {
+--
+pkg/tui/pages/mainPage/logList.go-			if logType == "ISSUE_LOG" {
+pkg/tui/pages/mainPage/logList.go-				// logModal.SetLogModalTextIssueLog(issueLogs[i].ID)
+pkg/tui/pages/mainPage/logList.go-				logModal.InitFormElements(pagePrimitive, &issueLogs[i].ID)
+pkg/tui/pages/mainPage/logList.go-				app.SetFocus(logModal.LogModalForm)
+pkg/tui/pages/mainPage/logList.go-			} else if logType == "QUICK_LOG" {
+pkg/tui/pages/mainPage/logList.go-				logModal.SetLogModalTextForQuickLog(quickLogs[i].ID)
+pkg/tui/pages/mainPage/logList.go-			}
+pkg/tui/pages/mainPage/logList.go-		}).
+pkg/tui/pages/mainPage/logList.go-		SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+pkg/tui/pages/mainPage/logList.go-			switch event.Rune() {
+pkg/tui/pages/mainPage/logList.go:			// NOTE: not working correctly at the moment:
+pkg/tui/pages/mainPage/logList.go-			// dont take notes after copy and display comment on running time
+pkg/tui/pages/mainPage/logList.go-			case 'c':
+pkg/tui/pages/mainPage/logList.go-				currentIssueId := issues[IssueList.GetCurrentItem()].ID
+pkg/tui/pages/mainPage/logList.go-				currentLogId := issueLogs[list.GetCurrentItem()].ID
+pkg/tui/pages/mainPage/logList.go-
+pkg/tui/pages/mainPage/logList.go-				copiedTimeLog, err := constants.LogRepo.CopyTimerByLogAndIssueId(currentLogId, currentIssueId)
+pkg/tui/pages/mainPage/logList.go-				if err != nil {
+pkg/tui/pages/mainPage/logList.go-					log.Fatal(err)
+pkg/tui/pages/mainPage/logList.go-					// notification.SetNotification("Something went wrong cannot copy Log.")
+pkg/tui/pages/mainPage/logList.go-					// pagePrimitive.ShowPage("Notification")
+pkg/tui/pages/mainPage/logList.go-				}
+pkg/tui/pages/mainPage/logList.go-				LogList.InsertItem(0, copiedTimeLog.Title(), copiedTimeLog.Comment, 0, nil)
+pkg/tui/pages/mainPage/logList.go-				break
+pkg/tui/pages/mainPage/logList.go-			case 'u':
+pkg/tui/pages/mainPage/logList.go:				// NOTE: UPDATE
+pkg/tui/pages/mainPage/logList.go-				currentLogId := issueLogs[list.GetCurrentItem()].ID
+pkg/tui/pages/mainPage/logList.go-				log, err := constants.LogRepo.GetLogByID(currentLogId)
+pkg/tui/pages/mainPage/logList.go-				if err != nil {
+pkg/tui/pages/mainPage/logList.go-					pagePrimitive.ShowPage("Notification")
+pkg/tui/pages/mainPage/logList.go-					notification.SetNotification("Log not found")
+pkg/tui/pages/mainPage/logList.go-				}
+pkg/tui/pages/mainPage/logList.go-				fmt.Println(log)
+pkg/tui/pages/mainPage/logList.go-
+pkg/tui/pages/mainPage/logList.go-			}
+pkg/tui/pages/mainPage/logList.go-			return helpers.RedifineUpAndDown(event)
+--
+pkg/tui/pages/noteModal/noteModal.go-		note.Path,
+pkg/tui/pages/noteModal/noteModal.go-		note.LineNumber,
+pkg/tui/pages/noteModal/noteModal.go-		note.Note,
+pkg/tui/pages/noteModal/noteModal.go-		note.Note,
+pkg/tui/pages/noteModal/noteModal.go-		note.Context,
+pkg/tui/pages/noteModal/noteModal.go-	))
+pkg/tui/pages/noteModal/noteModal.go-}
+pkg/tui/pages/noteModal/noteModal.go-
+pkg/tui/pages/noteModal/noteModal.go-func setNextOrPreviousNoteModalText(isNext bool) {
+pkg/tui/pages/noteModal/noteModal.go-
+pkg/tui/pages/noteModal/noteModal.go:	// NOTE: not the most performant (+ database query)
+pkg/tui/pages/noteModal/noteModal.go-	noteIds, err := constants.NoteRepo.GetAllNoteIds()
+pkg/tui/pages/noteModal/noteModal.go-	if err != nil {
+pkg/tui/pages/noteModal/noteModal.go-		log.Fatal(err)
+pkg/tui/pages/noteModal/noteModal.go-	}
+pkg/tui/pages/noteModal/noteModal.go-
+pkg/tui/pages/noteModal/noteModal.go-	var currentNoteIdIndex int
+pkg/tui/pages/noteModal/noteModal.go-	for index, noteId := range noteIds {
+pkg/tui/pages/noteModal/noteModal.go-		if noteId == int(currentNoteId) {
+pkg/tui/pages/noteModal/noteModal.go-			currentNoteIdIndex = index
+pkg/tui/pages/noteModal/noteModal.go-			break

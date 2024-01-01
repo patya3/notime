@@ -189,3 +189,11 @@ func (g *LogRepo) GetLogByID(id uint) (ExtendedLog, error) {
 	}
 	return log, nil
 }
+
+func (g *LogRepo) EditLog(log Log) (Log, error) {
+	err := g.DB.Model(&log).Where("id = ?", log.ID).Updates(map[string]interface{}{"created_at": log.CreatedAt, "stopped_at": log.StoppedAt, "comment": log.Comment}).Error
+	if err != nil {
+		return log, fmt.Errorf("Cannot edit log: %v", err)
+	}
+	return log, nil
+}

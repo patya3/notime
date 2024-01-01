@@ -6,6 +6,7 @@ import (
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/patya3/notime/pkg/tui/constants"
+	"github.com/patya3/notime/pkg/utils"
 	"github.com/rivo/tview"
 )
 
@@ -56,6 +57,17 @@ func SetNoteModalText(noteID uint) {
 		log.Fatal(err)
 	}
 	noteModal.SetText(fmt.Sprintf("%s\n\n[lightgreen]%s", note.Title, note.Description))
+}
+
+func SetNoteModalTextForVimNote(note utils.Hit) {
+
+	noteModal.SetText(fmt.Sprintf("Path:\n%s\nLine: [red]%d\n\nNote:\n[lightgreen]%s\n\n%s%s",
+		note.Path,
+		note.LineNumber,
+		note.Note,
+		note.Note,
+		note.Context,
+	))
 }
 
 func setNextOrPreviousNoteModalText(isNext bool) {

@@ -34,7 +34,12 @@ func InitNotesList(app *tview.Application, pagePrimitive *tview.Pages, list *tvi
 		SetSelectedBackgroundColor(tcell.ColorLightPink.TrueColor()).
 		SetSelectedFunc(func(i int, s1, s2 string, r rune) {
 			pagePrimitive.ShowPage("Note")
-			noteModal.SetNoteModalText(notes[i].ID)
+			if listType == "Notes" {
+				noteModal.SetNoteModalText(notes[i].ID)
+			} else {
+				// log.Println(vimNotes, i)
+				noteModal.SetNoteModalTextForVimNote(vimNotes[i])
+			}
 		}).
 		SetInputCapture(helpers.RedifineUpAndDown)
 
@@ -61,7 +66,8 @@ func InitNoteListElements() {
 
 func InitVimNotesListElements() {
 	VimNoteList.Clear()
-	vimNotes, err := utils.ParseVimNotes()
+	var err error
+	vimNotes, err = utils.ParseVimNotes()
 
 	if err != nil {
 		log.Fatal(err)
