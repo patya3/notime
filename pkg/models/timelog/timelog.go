@@ -23,6 +23,10 @@ type ExtendedLog struct {
 	IssueKey   string
 }
 
+func (l *Log) GetLogDurationInSeconds() int {
+	return int(l.StoppedAt.Time.Sub(l.CreatedAt).Seconds())
+}
+
 func (l *Log) Title() string {
 	// return fmt.Sprint(diff.Format("15:04:05"))
 	if l.StoppedAt.Valid {
