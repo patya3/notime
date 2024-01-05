@@ -98,7 +98,7 @@ func InitFormElements(app *tview.Application, pagePrimitive *tview.Pages, logTyp
 			extendedTimelog.Comment = text
 		}).
 		AddInputField("Started At", extendedTimelog.CreatedAt.Format("2006-01-02 15:04:05"), 0, nil, func(text string) {
-			date, error := time.Parse("2006-01-02 15:04:05", text)
+			date, error := time.ParseInLocation("2006-01-02 15:04:05", text, time.Local)
 			if error != nil {
 				LogModalForm.GetButton(0).SetDisabled(true)
 			} else {
@@ -107,7 +107,7 @@ func InitFormElements(app *tview.Application, pagePrimitive *tview.Pages, logTyp
 			extendedTimelog.CreatedAt = date
 		}).
 		AddInputField("Stopped At", extendedTimelog.StoppedAt.Time.Format("2006-01-02 15:04:05"), 0, nil, func(text string) {
-			dateTime, error := time.Parse("2006-01-02 15:04:05", text)
+			dateTime, error := time.ParseInLocation("2006-01-02 15:04:05", text, time.Local)
 			if error != nil {
 				LogModalForm.GetButton(0).SetDisabled(true)
 			} else {

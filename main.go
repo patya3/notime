@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 
 	"gorm.io/driver/sqlite"
@@ -88,7 +89,11 @@ func openSqlite() *gorm.DB {
 }
 
 func main() {
-	err := godotenv.Load(".env")
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = godotenv.Load(filepath.Join(homeDir, "notime", ".env"))
 
 	if err != nil {
 		log.Fatal("Error loading .env file")
