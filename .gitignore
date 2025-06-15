@@ -16,3 +16,4 @@
 main
 notime
 *.db
+.env

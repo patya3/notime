@@ -1,10 +1,5 @@
 package logModal
 
-// TODO: edit logModal and change it to a form which has the followings
-// StoppedAt => a field which show the elapsed time in the following format (HH:MM:SS)
-//           => and calculate the new StoppedAt from that and CreatedAt
-// Comment   string
-
 import (
 	"database/sql"
 	"fmt"
@@ -17,6 +12,7 @@ import (
 
 	"github.com/patya3/notime/pkg/tui/constants"
 	"github.com/patya3/notime/pkg/tui/pages/notification"
+	"github.com/patya3/notime/pkg/utils"
 
 	// "github.com/patya3/notime/pkg/tui/pages/notification"
 	"github.com/rivo/tview"
@@ -48,7 +44,7 @@ func InitLogModal(app *tview.Application, pagePrimitive *tview.Pages) tview.Prim
 		SetBorderColor(tcell.ColorBlue).
 		SetBackgroundColor(tcell.ColorDefault).
 		SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-			if event.Rune() == 'q' {
+			if event.Rune() == 'q' || event.Key() == tcell.KeyEscape {
 				pagePrimitive.HidePage("Log")
 				logModal.SetText("")
 				return nil
@@ -129,6 +125,14 @@ func InitFormElements(app *tview.Application, pagePrimitive *tview.Pages, logTyp
 			app.SetFocus(LogModalForm)
 		}).
 		AddButton("Quit", func() {
+			pagePrimitive.HidePage("Log")
+		}).
+		AddButton("Log", func() {
+			_, err := utils.CreateJiraWorkLog(extendedTimelog)
+			if err != nil {
+				notification.SetNotification(err.Error())
+				pagePrimitive.ShowPage("Notification")
+			}
 			pagePrimitive.HidePage("Log")
 		})
 }

@@ -17,6 +17,7 @@ import (
 	"github.com/patya3/notime/pkg/models/timelog"
 	"github.com/patya3/notime/pkg/tui"
 	"github.com/patya3/notime/pkg/tui/constants"
+	"github.com/patya3/notime/pkg/utils"
 )
 
 func createFileLogger(homeDir string) (logger.Interface, error) {
@@ -95,6 +96,12 @@ func main() {
 	}
 	err = godotenv.Load(filepath.Join(homeDir, "notime", ".env"))
 
+	utils.JiraBaseUrl = os.Getenv("JIRA_BASE_URL")
+	utils.UserEmail = os.Getenv("JIRA_EMAIL")
+	utils.ApiToken = os.Getenv("JIRA_API_TOKEN")
+	utils.Jql = os.Getenv("JIRA_JQL")
+	os.WriteFile("/home/pmeszaros/notime/random", []byte(filepath.Join(homeDir, "notime", ".env")), 0644)
+
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -111,6 +118,9 @@ func main() {
 	constants.NoteRepo = &noteRepo
 	projectRepo.CreateProject("VM", "Virtual Microscope")
 	projectRepo.CreateProject("IDV", "IDV")
+	projectRepo.CreateProject("OBS", "Bint")
+	projectRepo.CreateProject("TT", "TimeTracker")
+	projectRepo.CreateProject("MP", "MiniProjects")
 
 	tui.StartTui()
 }

@@ -2,9 +2,12 @@ package mainPage
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"strings"
 
 	"github.com/gdamore/tcell/v2"
+	c "github.com/patya3/notime/pkg/colors"
 	"github.com/patya3/notime/pkg/models/issue"
 	"github.com/patya3/notime/pkg/tui/constants"
 	"github.com/patya3/notime/pkg/tui/helpers"
@@ -14,6 +17,7 @@ import (
 
 var issues = make([]issue.Issue, 0)
 var SelectedIssueId sql.NullInt32
+var selectedIssueIndex int
 
 func InitIssueList(app *tview.Application, pagePrimitive *tview.Pages) {
 	IssueList.Box.
@@ -46,6 +50,7 @@ func InitIssueList(app *tview.Application, pagePrimitive *tview.Pages) {
 				LogList.Clear()
 				InitLogListElements(issues[i].ID)
 				SelectedIssueId.Scan(issues[i].ID)
+				selectedIssueIndex = i
 			}
 		}).
 		SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
@@ -74,6 +79,7 @@ func InitIssueList(app *tview.Application, pagePrimitive *tview.Pages) {
 						log.Fatal(err)
 					}
 					LogList.InsertItem(0, timelog.Title(), timelog.Comment, 0, nil)
+					IssueList.SetItemText(selectedIssueIndex, createItemText(issues[selectedIssueIndex], true), "")
 				}
 			case 's':
 				if len(issues) == 0 {
@@ -88,6 +94,7 @@ func InitIssueList(app *tview.Application, pagePrimitive *tview.Pages) {
 				// to be able to fill the commentModal with the existing text, if the log was coppied
 				if hasRunningLog {
 					pagePrimitive.ShowPage("AddComment")
+					IssueList.SetItemText(selectedIssueIndex, createItemText(issues[selectedIssueIndex], false), "")
 				} else {
 					notification.SetNotification("This Issue hasn't got a running log.")
 					pagePrimitive.ShowPage("Notification")
@@ -107,6 +114,15 @@ func InitIssueListElements() {
 		log.Fatal(err)
 	}
 	for _, issue := range issues {
-		IssueList.AddItem("[lightgreen]("+issue.IssueKey+") [pink]"+issue.IssueTitle, "", 0, nil)
+		IssueList.AddItem(createItemText(issue, len(issue.Logs) > 0 && !issue.Logs[0].StoppedAt.Valid), "", 0, nil)
 	}
+}
+
+func createItemText(issue issue.Issue, hasRunningLog bool) string {
+	replacer := strings.NewReplacer("[", "(", "]", ")")
+	rowColor := c.Colors["pink"]
+	if hasRunningLog {
+		rowColor = c.Colors["yellow"]
+	}
+	return fmt.Sprintf("%s("+issue.IssueKey+") %s%s", c.Colors["green"], rowColor, replacer.Replace(issue.IssueTitle))
 }

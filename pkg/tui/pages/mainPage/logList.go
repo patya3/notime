@@ -1,17 +1,16 @@
 package mainPage
 
 import (
-	"fmt"
 	"log"
 
-	"github.com/gdamore/tcell/v2"
 	"github.com/patya3/notime/pkg/models/timelog"
 	"github.com/patya3/notime/pkg/tui/constants"
 	"github.com/patya3/notime/pkg/tui/helpers"
 	"github.com/patya3/notime/pkg/tui/pages/logModal"
 	"github.com/patya3/notime/pkg/tui/pages/notification"
+	"github.com/patya3/notime/pkg/utils"
 
-	// "github.com/patya3/notime/pkg/tui/pages/notification"
+	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
@@ -54,7 +53,7 @@ func InitLogList(list *tview.List, logType string, app *tview.Application, pageP
 		}).
 		SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 			switch event.Rune() {
-			// NOTE: not working correctly at the moment:
+			// NOTE: copy not working correctly at the moment:
 			// dont take notes after copy and display comment on running time
 			case 'c':
 				currentIssueId := issues[IssueList.GetCurrentItem()].ID
@@ -66,15 +65,51 @@ func InitLogList(list *tview.List, logType string, app *tview.Application, pageP
 				}
 				LogList.InsertItem(0, copiedTimeLog.Title(), copiedTimeLog.Comment, 0, nil)
 				break
-			case 'u':
-				// NOTE: UPDATE
-				currentLogId := issueLogs[list.GetCurrentItem()].ID
-				log, err := constants.LogRepo.GetLogByID(currentLogId)
-				if err != nil {
-					pagePrimitive.ShowPage("Notification")
-					notification.SetNotification("Log not found")
+			case 'D':
+				// DELETE
+				helpers.SetConfirmationModal("Are you sure you want to delete this log?", app, pagePrimitive, LogList, func() {
+					currentLogId := issueLogs[list.GetCurrentItem()].ID
+					err := constants.LogRepo.DeleteLogByID(currentLogId)
+					if err != nil {
+						log.Fatal(err)
+					}
+					LogList.RemoveItem(list.GetCurrentItem())
+					pagePrimitive.HidePage("ConfirmationModal")
+				})
+				pagePrimitive.ShowPage("ConfirmationModal")
+				break
+			case 'L':
+				// LOG to jira
+				helpers.SetConfirmationModal("Are you sure you want to LOG this entry?", app, pagePrimitive, LogList, func() {
+					// timelog timelog.ExtendedLog
+					currentLogId := issueLogs[list.GetCurrentItem()].ID
+					extendedTimelog, err := constants.LogRepo.GetLogByID(currentLogId)
+
+					if err != nil {
+						notification.SetNotification(err.Error())
+						pagePrimitive.HidePage("ConfirmationModal")
+						pagePrimitive.ShowPage("Notification")
+						return
+					}
+
+					_, err = utils.CreateJiraWorkLog(extendedTimelog)
+					if err != nil {
+						notification.SetNotification(err.Error())
+						pagePrimitive.HidePage("ConfirmationModal")
+						pagePrimitive.ShowPage("Notification")
+						return
+					}
+					LogList.RemoveItem(list.GetCurrentItem())
+					pagePrimitive.HidePage("ConfirmationModal")
+				})
+				pagePrimitive.ShowPage("ConfirmationModal")
+				break
+			case 'A': // TODO:
+				// assign to quicklog list to issue
+				if logType == "ISSUE_LOG" {
+					// display a modal where you can select from already synced issues
 				}
-				fmt.Println(log)
+				break
 
 			}
 			return helpers.RedifineUpAndDown(event)

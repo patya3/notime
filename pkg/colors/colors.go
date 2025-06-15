@@ -13,5 +13,8 @@ var (
 		"lightorange": "[#ffaf87]",
 		"lightblue":   "[#afd7ff]",
 		"white":       "[#cccccc]",
+		"yellow":      "[#fae100]",
+		"pink":        "[pink]",
+		"grey":        "[#babab8]",
 	}
 )

@@ -28,7 +28,7 @@ func InitAddNoteModal(app *tview.Application, pagePrimitive *tview.Pages) tview.
 		SetBorder(true).
 		SetBackgroundColor(tcell.ColorDefault).
 		SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-			if event.Rune() == 'q' || event.Key() == tcell.KeyEscape {
+			if event.Key() == tcell.KeyEscape {
 				pagePrimitive.HidePage("AddNote")
 			}
 			return event

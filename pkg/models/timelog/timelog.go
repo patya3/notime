@@ -15,6 +15,7 @@ type Log struct {
 	IssueID   sql.NullInt32 `sql:"DEFAULT:NULL"`
 	Comment   string
 	Logged    bool
+	// Paused    bool NOTE: for future use
 }
 
 type ExtendedLog struct {
@@ -30,22 +31,34 @@ func (l *Log) GetLogDurationInSeconds() int {
 func (l *Log) Title() string {
 	// return fmt.Sprint(diff.Format("15:04:05"))
 	if l.StoppedAt.Valid {
+		logged := ""
+		if l.Logged {
+			logged = c.Colors["grey"] + "{Logged} "
+		}
 		diff := time.Time{}.Add(l.StoppedAt.Time.Sub(l.CreatedAt))
-		return fmt.Sprintf("[red](%s%s[red])[pink] - Duration: %s%s",
+		currentDate := l.CreatedAt.Format("2006-01-02")
+		return fmt.Sprintf("%s%s(%s%s%s)%s - Duration: %s%s - %s(%s)",
+			logged,
+			c.Colors["red"],
 			c.Colors["lightorange"],
 			fmt.Sprintf("%d", l.ID),
+			c.Colors["red"],
+			c.Colors["pink"],
 			c.Colors["lightpurple"],
-			diff.Format("15:04:05"),
+			diff.Format("15:04"),
+			c.Colors["pink"],
+			currentDate,
 		)
 	}
 	currentTime := time.Time{}.Add(time.Now().Sub(l.CreatedAt))
-	return fmt.Sprintf("%s(%s%s%s)[pink] - Running: %s%s",
+	return fmt.Sprintf("%s(%s%s%s)%s - Running: %s%s",
 		c.Colors["darkgreen"],
 		c.Colors["green"],
 		fmt.Sprintf("%d", l.ID),
 		c.Colors["darkgreen"],
+		c.Colors["pink"],
 		c.Colors["lightpurple"],
-		currentTime.Format("15:04:05"),
+		currentTime.Format("15:04"),
 	)
 }
 
@@ -95,6 +108,13 @@ func (g *LogRepo) StopTimerForQuickLog() (Log, error) {
 		return log, fmt.Errorf("Cannot stop timer: %v", err)
 	}
 	return log, nil
+}
+
+func (g *LogRepo) MarkAsLogged(logID uint) error {
+	if err := g.DB.Model(&Log{}).Where("id = ? AND stopped_at IS NOT NULL AND logged = false", logID).Update("logged", true).Error; err != nil {
+		return fmt.Errorf("Cannot mark as logged: %v", err)
+	}
+	return nil
 }
 
 func (g *LogRepo) CopyTimerByLogAndIssueId(logID uint, issueID uint) (Log, error) {
@@ -200,4 +220,11 @@ func (g *LogRepo) EditLog(log Log) (Log, error) {
 		return log, fmt.Errorf("Cannot edit log: %v", err)
 	}
 	return log, nil
+}
+
+func (g *LogRepo) DeleteLogByID(logID uint) error {
+	if err := g.DB.Delete(&Log{}, logID).Error; err != nil {
+		return fmt.Errorf("Cannot delete log: %v", err)
+	}
+	return nil
 }

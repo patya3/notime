@@ -44,9 +44,6 @@ func (g *IssueRepo) GetAllIssues() ([]Issue, error) {
 
 		return issues, fmt.Errorf("No issues found: %v", err)
 	}
-	// str, _ := json.MarshalIndent(issues, "", "\t")
-	// fmt.Println(string(str))
-	// os.Exit(0)
 	return issues, nil
 }
 

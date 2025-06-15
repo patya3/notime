@@ -24,16 +24,17 @@ func InitAddIssueForm(app *tview.Application, pagePrimitive *tview.Pages) tview.
 			AddItem(nil, 0, 1, false)
 	}
 
+	AddIssueForm.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Rune() == 'q' || event.Key() == tcell.KeyEscape {
+			pagePrimitive.HidePage("AddIssue")
+		}
+		return event
+	})
+
 	AddIssueForm.Box.
 		SetTitle("Add new issue").
 		SetBorder(true).
-		SetBackgroundColor(tcell.ColorDefault).
-		SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-			if event.Rune() == 'q' || event.Key() == tcell.KeyEscape {
-				pagePrimitive.HidePage("AddIssue")
-			}
-			return event
-		})
+		SetBackgroundColor(tcell.ColorDefault)
 
 	initFormElements(AddIssueForm, app, pagePrimitive)
 

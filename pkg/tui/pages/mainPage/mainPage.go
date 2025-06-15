@@ -38,6 +38,9 @@ func InitMainPage(app *tview.Application, pagePrimitive *tview.Pages) *tview.Fle
 			pagePrimitive.ShowPage("NotePage")
 			app.SetFocus(notePage.NoteList)
 			break
+		case 'u':
+			pagePrimitive.ShowPage("SyncModal")
+			break
 		case 'A':
 			hasRunningQuickLog, err := constants.LogRepo.HasRunningLogQuickLog()
 			if err != nil {
